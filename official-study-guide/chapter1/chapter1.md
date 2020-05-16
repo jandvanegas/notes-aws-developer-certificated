@@ -168,5 +168,97 @@ dseUS9O2q1hMP8DJuEfsbaiK2ASsmXSRA8vOZnuu4AsBq6ERasBw5EcpICP/Ne8zdKO/93tYF",
 * AWS looks up the permissions policies associated with the IAM role, not others, even if the principal was an user.
 * You cannot next IAM roles or add IAM orles to IAM grops
 
-
 ![](image8.png)
+
+### Choosing IAM identities
+
+![](image9.png)
+
+### Managing authorization with policies
+
+* Any API is implicitly denied unless there is a policy that explicitly allows it.
+* If there is a policy that explicityly denies an action, that policy always takes precedence.
+* AWS recommends that you adopt the principle of least privilege.
+* One method of granting perissions is to use AWS managed policies.
+* Managed policies supposrt common tasks and are automatically updated as new services and API operations are added.
+
+Example: AmazonPollyReadOnlyAccess policy is defined as
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "polly:DescribeVoices",
+                "polly:GetLexicon",
+                "polly:ListLexicons",
+                "polly:SynthesizeSpeech"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
+
+
+### Custom policies
+* AWS recommends that you use the AWS manged policies whenever possible. However, when you need more control you candefine custom policies
+
+* An IAM policy is a JSON-style document compsed of:
+	* One or more statements
+		* Effect: allow or deny access
+		* Action: actions on AWS resources
+		* Resource: specific ARN (Amazon Resource Name) or wildcards
+		* Sid: statement id for additional components
+		* Condition Block
+		* Principal: if the policy is attached to a resource
+
+![](image_10.png)
+
+Example
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+      "Sid": "AllowDeleteSpecifiedRegion",
+      "Effect": "Allow",
+      "Action": [
+         "polly:DeleteLexicon"],
+      "Resource": "arn:aws:polly:us-east-2:123456789012:lexicon/*"
+      }
+   ]
+}
+```
+Wildcards for ARN. An ARN start with arn: and can include
+
+* Partition: usually aws, for some regions as in China this can change
+* Service: namespace. e.g. polly
+* Region
+* Accound ID
+* Resource
+
+Example
+
+```
+arn:partition:service:region:account-id:resource
+arn:partition:service:region:account-id:resourcetype/resource
+arn:partition:service:region:account-id:resourcetype:resource
+
+<!-- Amazon Polly Lexicon -->
+arn:aws:polly:us-west-2:123456789012:lexicon/awsLexicon
+ 
+<!-- IAM user name -->
+arn:aws:iam::123456789012:user/carla
+ 
+ 
+<!-- Object in an Amazon S3 bucket -->
+arn:aws:s3:::bucket-name/exampleobject.png
+```
+
+### Useful commands
+* `aws configure get region`
+
